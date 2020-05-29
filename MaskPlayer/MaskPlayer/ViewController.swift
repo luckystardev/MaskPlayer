@@ -15,10 +15,18 @@ class myFolder {
     var title: String
     var assets: [DKAsset]?
 
-init(title:String, assets: [DKAsset]?){
-    self.title = title
-    self.assets = assets
-   }
+    init(title:String, assets: [DKAsset]?){
+        self.title = title
+        self.assets = assets
+    }
+    
+    func updateTitle(_ title: String) {
+        self.title = title
+    }
+    
+    func updateAssets(_ assets: [DKAsset]?) {
+        self.assets = assets
+    }
 }
 
 enum PICK_STATUS: Int {
@@ -71,13 +79,14 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             if answer.text != "" {
                 self.currentTitle = answer.text!
                 self.assets?.removeAll()
+                self.assets = [DKAsset]()
                 self.pickStatus = PICK_STATUS.new
                 self.currentFolderIndex = self.folders?.count
                 self.showImagePicker()
             }
         }
         
-        let cancelAction = UIAlertAction(title: "OK", style: .default) { [] _ in
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default) { [] _ in
             // do something interesting with "answer" here
         }
         
@@ -134,6 +143,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             self.folderCV?.reloadData()
         } else {
             print("update")
+            let folder = self.folders![currentFolderIndex]
+            folder.updateAssets(assets)
         }
         
         self.previewView?.reloadData()
@@ -169,11 +180,49 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         self.present(player, animated: true, completion: nil)
     }
     
+    @objc func addButtonSelected(sender: UIButton){
+        print(sender.tag)
+        currentFolderIndex = sender.tag
+        let folder = self.folders![currentFolderIndex]
+        self.assets = folder.assets
+        self.pickStatus = PICK_STATUS.add
+        self.showImagePicker()
+    }
+    
+    @objc func editButtonSelected(sender: UIButton){
+        print(sender.tag)
+        let folder = self.folders![sender.tag]
+        let oldTitle = folder.title
+        let ac = UIAlertController(title: "Edit Folder name", message: nil, preferredStyle: .alert)
+        ac.addTextField() { newTextField in
+            newTextField.text = oldTitle
+        }
+        
+        let createAction = UIAlertAction(title: "OK", style: .default) { [unowned ac] _ in
+            let answer = ac.textFields![0]
+            // do something interesting with "answer" here
+            if answer.text != "" {
+                folder.updateTitle(answer.text!)
+                self.folders![sender.tag] = folder
+                self.folderCV?.reloadData()
+            }
+        }
+        
+        ac.addAction(createAction)
+        present(ac, animated: true)
+    }
+    
+    @objc func deleteButtonSelected(sender: UIButton){
+        print(sender.tag)
+        self.folders?.remove(at: sender.tag)
+        self.folderCV?.reloadData()
+        self.previewView?.reloadData()
+    }
+    
     // MARK: - UICollectionViewDataSource, UICollectionViewDelegate
        
    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     if collectionView == self.folderCV {
-        print(self.folders?.count)
         return self.folders?.count ?? 0
     }
        return self.assets?.count ?? 0
@@ -185,6 +234,20 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             let title = folder.title
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FolderCell", for: indexPath) as! FolderCell
             cell.titleLbl.text = title
+            
+            cell.addBtn.addTarget(self, action: #selector(addButtonSelected), for: .touchUpInside)
+            cell.editBtn.addTarget(self, action: #selector(editButtonSelected), for: .touchUpInside)
+            cell.deleteBtn.addTarget(self, action: #selector(deleteButtonSelected), for: .touchUpInside)
+            cell.addBtn.tag = indexPath.row
+            cell.editBtn.tag = indexPath.row
+            cell.deleteBtn.tag = indexPath.row
+            
+            cell.layer.borderWidth = 2
+            if indexPath.item == currentFolderIndex {
+                cell.layer.borderColor = UIColor.red.cgColor
+            } else {
+                cell.layer.borderColor = UIColor.clear.cgColor
+            }
             
             return cell
         } else {
@@ -224,7 +287,12 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 //       }
     
         if collectionView == folderCV {
-            
+            print("folderCV selected")
+            currentFolderIndex = indexPath.item
+            let folder = self.folders![indexPath.item]
+            self.assets = folder.assets
+            self.folderCV?.reloadData()
+            self.previewView?.reloadData()
         } else {
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(withIdentifier: "PlayerVC") as! PlayerVC
