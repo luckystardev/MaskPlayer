@@ -137,12 +137,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         
         self.assets = assets
         if self.pickStatus == PICK_STATUS.new {
-            print("new")
             let newfolder = myFolder(title: self.currentTitle, assets: assets)
             self.folders?.append(newfolder)
             self.folderCV?.reloadData()
         } else {
-            print("update")
             let folder = self.folders![currentFolderIndex]
             folder.updateAssets(assets)
         }
@@ -181,7 +179,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     @objc func addButtonSelected(sender: UIButton){
-        print(sender.tag)
         currentFolderIndex = sender.tag
         let folder = self.folders![currentFolderIndex]
         self.assets = folder.assets
@@ -190,7 +187,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     @objc func editButtonSelected(sender: UIButton){
-        print(sender.tag)
         let folder = self.folders![sender.tag]
         let oldTitle = folder.title
         let ac = UIAlertController(title: "Edit Folder name", message: nil, preferredStyle: .alert)
@@ -213,7 +209,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     @objc func deleteButtonSelected(sender: UIButton){
-        print(sender.tag)
         self.folders?.remove(at: sender.tag)
         self.folderCV?.reloadData()
         self.previewView?.reloadData()
@@ -331,11 +326,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     func updateDoneButtonTitle(_ doneButton: UIButton) {
-        print("updateDoneButtonTitle"); doneButton.setTitle("Done(\(self.pickerController.selectedAssets.count))", for: .normal)
+        doneButton.setTitle("Done(\(self.pickerController.selectedAssets.count))", for: .normal)
     }
     
     @objc func done() {
-        print("done");
         self.updateAssets(assets: self.pickerController.selectedAssets)
     }
     
