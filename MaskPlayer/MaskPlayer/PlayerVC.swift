@@ -81,8 +81,10 @@ class PlayerVC: UIViewController {
     }
     
     func playNextVideo() {
-        currentIndex += 1
-        playVideo()
+        if currentIndex < self.assets!.count - 1 {
+            currentIndex += 1
+            playVideo()
+        }
     }
     
     @IBAction func maskAction(_ sender: Any) {
@@ -97,9 +99,7 @@ class PlayerVC: UIViewController {
     
     @objc func playerDidFinishPlaying(note: NSNotification) {
         print("Video Finished")
-        if currentIndex < self.assets!.count - 1 {
-            playNextVideo()
-        }
+        playNextVideo()
     }
 
     /*

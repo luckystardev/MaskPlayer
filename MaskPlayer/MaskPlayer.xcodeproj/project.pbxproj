@@ -15,6 +15,7 @@
 		A31459602479F4DE00FBCC72 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A314595E2479F4DE00FBCC72 /* LaunchScreen.storyboard */; };
 		A33540EB247EA57E006884A4 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A33540EA247EA57E006884A4 /* Photos.framework */; };
 		A355791B248087CF0060F4FD /* PlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A355791A248087CF0060F4FD /* PlayerVC.swift */; };
+		A355791D2480EA090060F4FD /* FolderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A355791C2480EA090060F4FD /* FolderCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		A31459612479F4DE00FBCC72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A33540EA247EA57E006884A4 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		A355791A248087CF0060F4FD /* PlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerVC.swift; sourceTree = "<group>"; };
+		A355791C2480EA090060F4FD /* FolderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderCell.swift; sourceTree = "<group>"; };
 		B23B3693E57E9C9C6729FD25 /* Pods-MaskPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MaskPlayer.release.xcconfig"; path = "Target Support Files/Pods-MaskPlayer/Pods-MaskPlayer.release.xcconfig"; sourceTree = "<group>"; };
 		F3C2F378AB2129D95FD36CF3 /* Pods-MaskPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MaskPlayer.debug.xcconfig"; path = "Target Support Files/Pods-MaskPlayer/Pods-MaskPlayer.debug.xcconfig"; sourceTree = "<group>"; };
 		F718C1CFD31B171AE1780FEC /* Pods_MaskPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MaskPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,6 +80,7 @@
 				A31459532479F4DC00FBCC72 /* AppDelegate.swift */,
 				A31459572479F4DC00FBCC72 /* ViewController.swift */,
 				A355791A248087CF0060F4FD /* PlayerVC.swift */,
+				A355791C2480EA090060F4FD /* FolderCell.swift */,
 				A31459592479F4DC00FBCC72 /* Main.storyboard */,
 				A314595C2479F4DE00FBCC72 /* Assets.xcassets */,
 				A314595E2479F4DE00FBCC72 /* LaunchScreen.storyboard */,
@@ -230,6 +233,7 @@
 				A355791B248087CF0060F4FD /* PlayerVC.swift in Sources */,
 				A31459582479F4DC00FBCC72 /* ViewController.swift in Sources */,
 				A31459542479F4DC00FBCC72 /* AppDelegate.swift in Sources */,
+				A355791D2480EA090060F4FD /* FolderCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,15 +378,18 @@
 			baseConfigurationReference = F3C2F378AB2129D95FD36CF3 /* Pods-MaskPlayer.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = BCY2DA85X2;
 				INFOPLIST_FILE = MaskPlayer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.alex.MaskPlayer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alz.iRat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = iRatAdhocProv;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -393,15 +400,18 @@
 			baseConfigurationReference = B23B3693E57E9C9C6729FD25 /* Pods-MaskPlayer.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = BCY2DA85X2;
 				INFOPLIST_FILE = MaskPlayer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.alex.MaskPlayer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alz.iRat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = iRatAdhocProv;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

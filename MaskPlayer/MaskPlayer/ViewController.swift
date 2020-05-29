@@ -11,13 +11,33 @@ import DKImagePickerController
 import Photos
 import AVKit
 
+class myFolder {
+    var title: String
+    var assets: [DKAsset]?
+
+init(title:String, assets: [DKAsset]?){
+    self.title = title
+    self.assets = assets
+   }
+}
+
+enum PICK_STATUS: Int {
+    case new     = 100
+    case add     = 200
+}
+
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, DKImageAssetExporterObserver {
     
     var pickerController: DKImagePickerController!
     @IBOutlet var previewView: UICollectionView?
+    @IBOutlet weak var folderCV: UICollectionView?
+    
     var exportManually = false
     var assets: [DKAsset]?
-    var currentIndex: Int!
+    var folders:[myFolder]? = [myFolder]()
+    var currentFolderIndex: Int! = 0
+    var currentTitle: String = ""
+    var pickStatus = PICK_STATUS.new
     
     deinit {
         DKImagePickerControllerResource.customLocalizationBlock = nil
@@ -38,6 +58,32 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
     @IBAction func pickVideoAction(_ sender: Any) {
         showImagePicker()
+    }
+    
+    @IBAction func pickVideoWithFolderAction(_ sender: Any) {
+        let ac = UIAlertController(title: "Enter Folder name", message: nil, preferredStyle: .alert)
+        ac.addTextField() { newTextField in
+        }
+        
+        let createAction = UIAlertAction(title: "CREATE", style: .default) { [unowned ac] _ in
+            let answer = ac.textFields![0]
+            // do something interesting with "answer" here
+            if answer.text != "" {
+                self.currentTitle = answer.text!
+                self.assets?.removeAll()
+                self.pickStatus = PICK_STATUS.new
+                self.currentFolderIndex = self.folders?.count
+                self.showImagePicker()
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "OK", style: .default) { [] _ in
+            // do something interesting with "answer" here
+        }
+        
+        ac.addAction(createAction)
+        ac.addAction(cancelAction)
+        present(ac, animated: true)
     }
     
     func showImagePicker() {
@@ -81,6 +127,15 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         print("didSelectAssets")
         
         self.assets = assets
+        if self.pickStatus == PICK_STATUS.new {
+            print("new")
+            let newfolder = myFolder(title: self.currentTitle, assets: assets)
+            self.folders?.append(newfolder)
+            self.folderCV?.reloadData()
+        } else {
+            print("update")
+        }
+        
         self.previewView?.reloadData()
         
         if pickerController.exportsWhenCompleted {
@@ -117,33 +172,47 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     // MARK: - UICollectionViewDataSource, UICollectionViewDelegate
        
    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    if collectionView == self.folderCV {
+        print(self.folders?.count)
+        return self.folders?.count ?? 0
+    }
        return self.assets?.count ?? 0
    }
    
    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-       let asset = self.assets![indexPath.row]
-       var cell: UICollectionViewCell?
-       var imageView: UIImageView?
-       var maskView: UIView?
+        if collectionView == self.folderCV {
+            let folder = self.folders![indexPath.item]
+            let title = folder.title
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FolderCell", for: indexPath) as! FolderCell
+            cell.titleLbl.text = title
+            
+            return cell
+        } else {
+            let asset = self.assets![indexPath.row]
+            var cell: UICollectionViewCell?
+            var imageView: UIImageView?
+            var maskView: UIView?
+            
+            cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellVideo", for: indexPath)
+            imageView = cell?.contentView.viewWithTag(1) as? UIImageView
+            maskView = cell?.contentView.viewWithTag(2)
+            
+            if let cell = cell, let imageView = imageView {
+                let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+                let tag = indexPath.row + 1
+                cell.tag = tag
+                asset.fetchImage(with: layout.itemSize.toPixel(), completeBlock: { image, info in
+                    if cell.tag == tag {
+                        imageView.image = image
+                    }
+                })
+            }
+            
+            maskView?.isHidden = !self.exportManually
+            
+            return cell!
+        }
        
-       cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellVideo", for: indexPath)
-       imageView = cell?.contentView.viewWithTag(1) as? UIImageView
-       maskView = cell?.contentView.viewWithTag(2)
-       
-       if let cell = cell, let imageView = imageView {
-           let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-           let tag = indexPath.row + 1
-           cell.tag = tag
-           asset.fetchImage(with: layout.itemSize.toPixel(), completeBlock: { image, info in
-               if cell.tag == tag {
-                   imageView.image = image
-               }
-           })
-       }
-       
-       maskView?.isHidden = !self.exportManually
-       
-       return cell!
    }
    
    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -154,12 +223,17 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 //           })
 //       }
     
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "PlayerVC") as! PlayerVC
-        vc.currentIndex = indexPath.row
-        vc.assets = self.assets!
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true)
+        if collectionView == folderCV {
+            
+        } else {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(withIdentifier: "PlayerVC") as! PlayerVC
+                vc.currentIndex = indexPath.row
+                vc.assets = self.assets!
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true)
+        }
+        
    }
     
     // MARK: - Inline Mode
@@ -175,6 +249,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         doneButton.frame = CGRect(x: 0, y: pickerView.frame.maxY, width: pickerView.bounds.width / 2, height: 50)
         self.view.addSubview(doneButton)
         self.pickerController.selectedChanged = { [unowned self] in
+            print("selectedChanged")
             self.updateDoneButtonTitle(doneButton)
         }
         self.updateDoneButtonTitle(doneButton)
@@ -188,10 +263,11 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     func updateDoneButtonTitle(_ doneButton: UIButton) {
-        doneButton.setTitle("Done(\(self.pickerController.selectedAssets.count))", for: .normal)
+        print("updateDoneButtonTitle"); doneButton.setTitle("Done(\(self.pickerController.selectedAssets.count))", for: .normal)
     }
     
     @objc func done() {
+        print("done");
         self.updateAssets(assets: self.pickerController.selectedAssets)
     }
     
